@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('attempt_answers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('attempt_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('question_id')->constrained()->cascadeOnDelete();
-            $table->json('selected_option_ids')->nullable();
+            $table->foreignId('attempt_id')->constrained()->restrictOnDelete();
+            $table->foreignId('question_id')->constrained()->restrictOnDelete();
+            $table->foreignId('selected_option_id')->nullable()->constrained('question_options')->restrictOnDelete();
             $table->text('text_answer')->nullable();
-            $table->boolean('is_correct')->nullable();
             $table->integer('awarded_points')->nullable();
             $table->unique(['attempt_id','question_id']);
             $table->timestamps();
