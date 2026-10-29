@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dateTime('submitted_at')->nullable();
             $table->enum('status',['in_progress','submitted','expired'])->default('in_progress');
             $table->unique(['exam_id','student_id']);
-            $table->decimal('score')->nullable();
+            $table->integer('score')->nullable();
             $table->dateTime('graded_at')->nullable();
             $table->timestamps();
             $table->index(['status','expires_at']);
