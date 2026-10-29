@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AttemptAnswer extends Model
 {
+    protected $fillable = ['selected_option_id', 'text_answer'];
+
     public function question()
     {
         return $this->belongsTo(Question::class);
@@ -14,7 +16,8 @@ class AttemptAnswer extends Model
     {
         return $this->belongsTo(Attempt::class);
     }
-    public function questionOption(){
-        return $this->belongsTo(QuestionOption::class,'selected_option_id');
+    public function questionOption()
+    {
+        return $this->belongsTo(QuestionOption::class, 'selected_option_id');
     }
 }

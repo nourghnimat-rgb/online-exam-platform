@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attempt extends Model
 {
+    protected $fillable = [];
+
     public function student()
     {
         return $this->belongsTo(User::class, "student_id");
