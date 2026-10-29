@@ -29,4 +29,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class);
+    }
+    public function attempts()
+    {
+        return $this->hasMany(Attempt::class, 'student_id');
+    }
+    public function exams()
+    {
+        return $this->hasMany(Exam::class, 'created_by');
+    }
 }
