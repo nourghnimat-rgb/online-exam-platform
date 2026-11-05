@@ -21,9 +21,18 @@ class AuthController extends Controller
         $user = $this->authService->register($request->validated());
         return redirect()->route('dashboard');
     }
+    public function showLogin(): View
+    {
+        return view('auth.login');
+    }
     public function login(LoginRequest $request)
     {
         $user = $this->authService->login($request->validated());
         return redirect()->route('dashboard');
+    }
+    public function logout(){
+        $this->authService->logout();
+        return redirect('/login');
+
     }
 }
