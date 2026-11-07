@@ -33,4 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
     Route::put('/courses/{course}/instructors', [CourseController::class, 'updateInstructors'])->name('courses.instructors');
     Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->can('delete', 'course')->name('courses.destroy');
+
+
+    Route::get('/courses/{course}/student',[CourseController::class,'students'])->can('manageStudents','course')->name('courses.students.index');
+    Route::post('/courses/{course}/student',[CourseController::class,'addStudent'])->name('courses.students.add');
+    Route::delete('/courses/{course}/students/{user}',[CourseController::class,'removeStudent'])->can('removeStudent',['course','user'])->name('courses.students.remove');
 });

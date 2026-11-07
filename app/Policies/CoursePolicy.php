@@ -13,7 +13,7 @@ class CoursePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role==='admin';
+        return $user->role === 'admin' || $user->role === 'instructor';
     }
 
     /**
@@ -29,7 +29,7 @@ class CoursePolicy
      */
     public function create(User $user): bool
     {
-        return $user->role==='admin';
+        return $user->role === 'admin';
     }
 
     /**
@@ -37,7 +37,7 @@ class CoursePolicy
      */
     public function update(User $user, Course $course): bool
     {
-       return $user->role==='admin';
+        return $user->role === 'admin';
     }
 
     /**
@@ -45,7 +45,23 @@ class CoursePolicy
      */
     public function delete(User $user, Course $course): bool
     {
-        return $user->role==='admin'&& !$course->exams()->exists();
+        return $user->role === 'admin' && !$course->exams()->exists();
+    }
+    public function manageStudents(User $user, Course $course): bool
+    {
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return $user->role === 'instructor'
+            && $course->users()->where('users.id', $user->id)->exists();
+    }
+
+    public function removeStudent(User $user, Course $course, User $student): bool
+    {
+        return $this->manageStudents($user, $course)
+            && $student->role === 'student'
+            && $course->users()->where('users.id', $student->id)->exists();
     }
 
     /**

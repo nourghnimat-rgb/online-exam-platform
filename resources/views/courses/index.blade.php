@@ -30,6 +30,9 @@
                     </td>
                     <td>{{ $course->users_count }}</td>
                     <td class="d-flex gap-2">
+                        @can('manageStudents', $course)
+                        <a href="{{ route('courses.students.index', $course) }}" class="btn btn-sm btn-info">Students</a>
+                        @endcan
                         @can('update', $course)
                         <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-secondary">Edit</a>
                         @endcan
@@ -44,7 +47,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="3" class="text-center text-muted">No classes yet.</td>
+                    <td colspan="4" class="text-center text-muted">No classes yet.</td>
                 </tr>
                 @endforelse
             </tbody>

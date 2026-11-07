@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddStudentRequest;
 use App\Http\Requests\AssignInstructorRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Models\Course;
+use App\Models\User;
 use App\Services\CourseService;
 use Illuminate\Http\Request;
 
@@ -46,5 +48,23 @@ class CourseController extends Controller
     {
         $service->delete($course);
         return redirect()->route('courses.index')->with('success', 'course deleted.');
+    }
+    public function students(Course $course, CourseService $service)
+    {
+        return view('courses.students', ['course' => $course, 'students' => $service->students($course),]);
+    }
+    public function addStudent(AddStudentRequest $request, Course $course, CourseService $service)
+    {
+        $added = $service->addStudent($course, $request->validated('email'));
+        if ($added) {
+            return back()->with('success', 'student added successfully');
+        } else {
+            return back()->with('error', 'student is already enrolled in this course ');
+        }
+    }
+    public function removeStudent(Course $course, CourseService $service, User $user)
+    {
+        $service->removeStudent($course, $user);
+        return back()->with('success', 'student removed successfully');
     }
 }
