@@ -38,4 +38,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses/{course}/student',[CourseController::class,'students'])->can('manageStudents','course')->name('courses.students.index');
     Route::post('/courses/{course}/student',[CourseController::class,'addStudent'])->name('courses.students.add');
     Route::delete('/courses/{course}/students/{user}',[CourseController::class,'removeStudent'])->can('removeStudent',['course','user'])->name('courses.students.remove');
+
+    Route::get('/my-courses',[CourseController::class,'mine'])->can('viewCourses',Course::class)->name('courses.mine');
 });

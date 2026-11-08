@@ -21,6 +21,11 @@
                 <a class="nav-link" href="{{ route('courses.index') }}">My Courses</a>
             </li>
             @endif
+            @if (auth()->user()->role === 'student')
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('courses.mine') }}">My Courses</a>
+            </li>
+            @endif
 
             <li class="nav-item">
                 <form action="{{ route('logout') }}" method="POST">

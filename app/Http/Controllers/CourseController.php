@@ -67,4 +67,9 @@ class CourseController extends Controller
         $service->removeStudent($course, $user);
         return back()->with('success', 'student removed successfully');
     }
+    public function mine(Request $request){
+
+        $courses = $request->user()->courses()->withCount('exams')->orderBy('name')->get();
+        return view('courses.mine',['courses'=>$courses]);
+    }
 }

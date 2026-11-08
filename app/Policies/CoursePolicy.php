@@ -23,6 +23,9 @@ class CoursePolicy
     {
         return false;
     }
+    public function viewCourses(User $user){
+        return $user->role==="student";
+    }
 
     /**
      * Determine whether the user can create models.
