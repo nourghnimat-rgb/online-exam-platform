@@ -14,7 +14,7 @@ class CourseController extends Controller
 {
     public function index(Request $request, CourseService $service)
     {
-        $courses = $service->paginate($request->search);
+        $courses = $service->paginate($request->search,$request->user());
         return view('courses.index', ['courses' => $courses]);
     }
     public function create()

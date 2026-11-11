@@ -23,6 +23,7 @@ return new class extends Migration
             $table->decimal('pass_mark',5,2);
             $table->enum('status',['draft','published'])->default('draft');
             $table->boolean('show_correct_answers')->default(false);
+            $table->boolean('randomize_questions')->default(false);
             $table->timestamps();
         });
     }

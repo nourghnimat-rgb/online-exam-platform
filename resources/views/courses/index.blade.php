@@ -43,6 +43,9 @@
                             <button class="btn btn-sm btn-danger">Delete</button>
                         </form>
                         @endcan
+                        @can('manageStudents', $course)
+                        <a href="{{ route('exams.index', $course) }}" class="btn btn-sm btn-success">Exams</a>
+                        @endcan
                     </td>
                 </tr>
                 @empty

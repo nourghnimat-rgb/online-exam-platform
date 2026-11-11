@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('question_id')->constrained()->restrictOnDelete();
             $table->foreignId('selected_option_id')->nullable()->constrained('question_options')->restrictOnDelete();
             $table->text('text_answer')->nullable();
-            $table->integer('awarded_points')->nullable();
+            $table->decimal('awarded_points')->nullable();
             $table->timestamps();
         });
     }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attempt extends Model
 {
-    protected $fillable = [];
+    protected $fillable = ['exam_id', 'student_id', 'started_at', 'expires_at', 'submitted_at', 'status', 'score', 'graded_at'];
 
     public function student()
     {

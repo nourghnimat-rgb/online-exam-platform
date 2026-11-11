@@ -9,14 +9,21 @@ use App\Models\User;
 class CourseService
 {
 
-    public function paginate($search)
+    public function paginate($search, $user)
     {
+        if ($user->role === 'instructor') {
+        $query = $user->courses();
+    } else {
+        $query = Course::query();
+    }
 
-        $query = Course::with('instructors')->withCount('users')->orderBy('name');
-        if ($search) {
-            $query->where('name', 'like', '%' . $search . '%');
-        }
-        return $query->paginate(15);
+    $query->with('instructors')->withCount('users')->orderBy('name');
+
+    if ($search) {
+        $query->where('name', 'like', '%' . $search . '%');
+    }
+
+    return $query->paginate(15);
     }
 
     public function create(array $data): Course
@@ -43,24 +50,26 @@ class CourseService
         $course->users()->detach($oldIds);
         $course->users()->attach($instructrIds);
     }
-    
-    public function students (Course $course){
 
-        return $course->users()->where('role','student')->orderBy('name')->get(); 
+    public function students(Course $course)
+    {
+
+        return $course->users()->where('role', 'student')->orderBy('name')->get();
     }
-    public function addStudent(Course $course , string $email){
+    public function addStudent(Course $course, string $email)
+    {
 
-        $student = User::where('email',$email)->where('role','student')->first();
+        $student = User::where('email', $email)->where('role', 'student')->first();
 
-        if ($course->users()->where('users.id',$student->id)->exists()){
+        if ($course->users()->where('users.id', $student->id)->exists()) {
             return false;
         }
         $course->users()->attach($student->id);
         return true;
     }
 
-    public function removeStudent(Course $course , User $student){
+    public function removeStudent(Course $course, User $student)
+    {
         $course->users()->detach($student->id);
     }
-
 }
