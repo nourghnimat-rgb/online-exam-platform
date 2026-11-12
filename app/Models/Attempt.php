@@ -6,8 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attempt extends Model
 {
-    protected $fillable = ['exam_id', 'student_id', 'started_at', 'expires_at', 'submitted_at', 'status', 'score', 'graded_at'];
-
+    protected $fillable = ['exam_id', 'student_id', 'started_at', 'expires_at', 'submitted_at', 'status', 'score', 'percentage', 'passed', 'graded_at'];
+    protected $casts = [
+        'started_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'submitted_at' => 'datetime',
+        'graded_at' => 'datetime',
+        'passed' => 'boolean',
+    ];
     public function student()
     {
         return $this->belongsTo(User::class, "student_id");
@@ -20,5 +26,4 @@ class Attempt extends Model
     {
         return $this->hasMany(AttemptAnswer::class);
     }
-
 }
