@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\QuestionOption;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class QuestionService
@@ -17,19 +18,21 @@ class QuestionService
 
     public function create(Exam $exam, array $data)
     {
-        $this->checkAttempts($exam);
+        return DB::transaction(function () use ($exam, $data) {
+            $this->checkAttempts($exam);
 
-        $question = new Question();
-        $question->exam_id = $exam->id;
-        $question->text = $data['text'];
-        $question->type = $data['type'];
-        $question->points = $data['points'];
-        $question->position = $exam->questions()->count() + 1;
-        $question->correct_answer = $data['correct_answer'] ?? null;
-        $question->save();
+            $question = new Question();
+            $question->exam_id = $exam->id;
+            $question->text = $data['text'];
+            $question->type = $data['type'];
+            $question->points = $data['points'];
+            $question->position = $exam->questions()->count() + 1;
+            $question->correct_answer = $data['correct_answer'] ?? null;
+            $question->save();
 
-        $this->saveOptions($question,$data['options']??[]);
-        return $question;
+            $this->saveOptions($question, $data['options'] ?? []);
+            return $question;
+        });
     }
     public function checkAttempts(Exam $exam)
     {
@@ -56,19 +59,23 @@ class QuestionService
     }
     public function update(Question $question, array $data)
     {
-        $this->checkAttempts($question->exam);
-        $question->text = $data['text'];
-        $question->type = $data['type'];
-        $question->points = $data['points'];
-        $question->correct_answer = $data['correct_answer'] ?? null;
-        $question->save();
+        return DB::transaction(function () use ($question, $data) {
+            $this->checkAttempts($question->exam);
+            $question->text = $data['text'];
+            $question->type = $data['type'];
+            $question->points = $data['points'];
+            $question->correct_answer = $data['correct_answer'] ?? null;
+            $question->save();
 
-        $this->saveOptions($question,$data['options']??[]);
-        return $question;
+            $this->saveOptions($question, $data['options'] ?? []);
+            return $question;
+        });
     }
-    public function delete(Question $question){
-         $this->checkAttempts($question->exam);
-         $question->delete();
-
+    public function delete(Question $question)
+    {
+        DB::transaction(function () use ($question) {
+            $this->checkAttempts($question->exam);
+            $question->delete();
+        });
     }
 }
