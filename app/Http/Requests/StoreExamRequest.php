@@ -28,7 +28,7 @@ class StoreExamRequest extends FormRequest
             'description'=>['nullable','string',],
             'duration_minutes'=>['required','integer','min:1'],
             'opens_at'=>['required','date'],
-            'closes_at'=>['required','date'],
+            'closes_at'=>['required','date','after:opens_at'],
             'pass_mark'=>['required','numeric','min:0','max:100'],
             'show_correct_answers'=>['boolean'],
             'randomize_questions'=>['boolean'],

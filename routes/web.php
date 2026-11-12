@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\UserController;
 use App\Models\Course;
 use App\Models\User;
@@ -59,4 +60,13 @@ Route::middleware('auth')->group(function () {
         ->can('update', 'exam')->name('exams.unpublish');
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])
         ->can('delete', 'exam')->name('exams.destroy');
+        
+    Route::get('/exams/{exam}/questions', [QuestionController::class, 'index'])
+        ->can('manageQuestions', 'exam')->name('questions.index');
+    Route::post('/exams/{exam}/questions', [QuestionController::class, 'store'])
+        ->name('questions.store');
+    Route::put('/questions/{question}', [QuestionController::class, 'update'])
+        ->name('questions.update');
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])
+        ->can('delete', 'question')->name('questions.destroy');
 });

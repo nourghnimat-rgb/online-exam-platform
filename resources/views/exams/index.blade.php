@@ -35,32 +35,35 @@
                     <td>{{ $exam->questions_count }}</td>
                     <td>{{ $exam->attempts_count }}</td>
                     <td class="d-flex gap-2">
+                        @can('manageQuestions', $exam)
+                        <a href="{{ route('questions.index', $exam) }}" class="btn btn-sm btn-outline-primary">Questions</a>
+                        @endcan
                         @can('update', $exam)
-                            <a href="{{ route('exams.edit', $exam) }}" class="btn btn-sm btn-secondary">Edit</a>
+                        <a href="{{ route('exams.edit', $exam) }}" class="btn btn-sm btn-secondary">Edit</a>
 
-                            @if ($exam->status === 'draft')
-                            <form method="POST" action="{{ route('exams.publish', $exam) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button class="btn btn-sm btn-success">Publish</button>
-                            </form>
-                            @elseif ($exam->attempts_count === 0)
-                            <form method="POST" action="{{ route('exams.unpublish', $exam) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button class="btn btn-sm btn-warning">Unpublish</button>
-                            </form>
-                            @endif
+                        @if ($exam->status === 'draft')
+                        <form method="POST" action="{{ route('exams.publish', $exam) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button class="btn btn-sm btn-success">Publish</button>
+                        </form>
+                        @elseif ($exam->attempts_count === 0)
+                        <form method="POST" action="{{ route('exams.unpublish', $exam) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button class="btn btn-sm btn-warning">Unpublish</button>
+                        </form>
+                        @endif
                         @endcan
 
                         @can('delete', $exam)
-                            @if ($exam->attempts_count === 0)
-                            <form method="POST" action="{{ route('exams.destroy', $exam) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                            @endif
+                        @if ($exam->attempts_count === 0)
+                        <form method="POST" action="{{ route('exams.destroy', $exam) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                        @endif
                         @endcan
                     </td>
                 </tr>
