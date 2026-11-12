@@ -61,4 +61,8 @@ class ExamPolicy
     {
         return $this->canManage($exam, $user);
     }
+    public function viewAvailable(User $user): bool
+{
+    return $user->role === 'student';
+}
 }

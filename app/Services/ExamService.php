@@ -53,4 +53,20 @@ class ExamService
 
         $exam->delete();
     }
+    public function availableFor(User $student)
+    {
+
+        $courseIds = $student->courses()->pluck('courses.id');
+
+        return Exam::query()
+            ->whereIn('course_id', $courseIds)
+            ->where('status', 'published')
+            ->where('opens_at', '<=', now())
+            ->where('closes_at', '>=', now())
+            ->with('course')
+            ->with(['attempts' => function ($query) use ($student) {
+                $query->where('student_id', $student->id);
+            }])
+            ->orderBy('closes_at');
+    }
 }

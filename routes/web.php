@@ -5,8 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\StudentExamController;
 use App\Http\Controllers\UserController;
 use App\Models\Course;
+use App\Models\Exam;
 use App\Models\User;
 
 Route::middleware('guest')->group(function () {
@@ -60,7 +62,7 @@ Route::middleware('auth')->group(function () {
         ->can('update', 'exam')->name('exams.unpublish');
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])
         ->can('delete', 'exam')->name('exams.destroy');
-        
+
     Route::get('/exams/{exam}/questions', [QuestionController::class, 'index'])
         ->can('manageQuestions', 'exam')->name('questions.index');
     Route::post('/exams/{exam}/questions', [QuestionController::class, 'store'])
@@ -69,4 +71,7 @@ Route::middleware('auth')->group(function () {
         ->name('questions.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])
         ->can('delete', 'question')->name('questions.destroy');
+        
+    Route::get('/my-exams', [StudentExamController::class, 'index'])
+        ->can('viewAvailable', Exam::class)->name('exams.available');
 });
