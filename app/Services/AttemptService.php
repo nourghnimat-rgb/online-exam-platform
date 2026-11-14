@@ -115,4 +115,21 @@ class AttemptService
         ]);
         GradeAttemptJob::dispatch($attempt->id);
     }
+    public function closeExpired()
+    {
+        $attempts = Attempt::where('status', 'in_progress')
+            ->where('expires_at', '<=', now())
+            ->get();
+
+        foreach ($attempts as $attempt) {
+            $attempt->update([
+                'status'       => 'expired',
+                'submitted_at' => $attempt->expires_at,
+            ]);
+
+            GradeAttemptJob::dispatch($attempt->id);
+        }
+
+        return $attempts->count();
+    }
 }
