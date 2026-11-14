@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendResultNotificationJob;
 use App\Models\Attempt;
 
 class GradingService
@@ -44,5 +45,6 @@ class GradingService
             'passed'     => $percentage >= $attempt->exam->pass_mark,
             'graded_at'  => now(),
         ]);
+        SendResultNotificationJob::dispatch($attempt->id);
     }
 }
