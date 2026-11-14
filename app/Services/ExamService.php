@@ -70,4 +70,5 @@ class ExamService
             }])
             ->orderBy('closes_at')->paginate(15);
     }
+    
 }

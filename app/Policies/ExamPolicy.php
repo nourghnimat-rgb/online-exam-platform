@@ -73,4 +73,8 @@ class ExamPolicy
             && $exam->closes_at->isFuture()
             && $exam->course->users()->where('users.id', $user->id)->exists();
     }
+    public function viewAttempts(User $user, Exam $exam)
+    {
+        return $this->canManage($exam, $user);
+    }
 }

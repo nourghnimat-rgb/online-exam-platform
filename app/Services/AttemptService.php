@@ -138,4 +138,8 @@ class AttemptService
 
         return $attempt->load('exam.questions.options', 'attemptAnswers');
     }
+    public function forExam(Exam $exam)
+{
+    return $exam->attempts()->with('student')->latest()->paginate(15);
+}
 }

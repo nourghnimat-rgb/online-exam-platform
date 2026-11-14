@@ -38,6 +38,9 @@
                         @can('manageQuestions', $exam)
                         <a href="{{ route('questions.index', $exam) }}" class="btn btn-sm btn-outline-primary">Questions</a>
                         @endcan
+                        @can('viewAttempts', $exam)
+                        <a href="{{ route('exams.attempts', $exam) }}" class="btn btn-sm btn-outline-secondary">Attempts</a>
+                        @endcan
                         @can('update', $exam)
                         <a href="{{ route('exams.edit', $exam) }}" class="btn btn-sm btn-secondary">Edit</a>
 
