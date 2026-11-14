@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\QuestionType;
+use App\Jobs\GradeAttemptJob;
 use App\Models\Attempt;
 use App\Models\Exam;
 use App\Models\User;
@@ -112,5 +113,6 @@ class AttemptService
             'status'       => 'submitted',
             'submitted_at' => now(),
         ]);
+        GradeAttemptJob::dispatch($attempt->id);
     }
 }
