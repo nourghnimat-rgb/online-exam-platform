@@ -35,4 +35,8 @@ public function submit(Attempt $attempt, AttemptService $service)
 
     return redirect()->route('exams.available')->with('success', 'Exam submitted.');
 }
+public function result(Attempt $attempt, AttemptService $service)
+{
+    return view('attempts.result', ['attempt' => $service->resultFor($attempt)]);
+}
 }

@@ -1,5 +1,11 @@
 <x-layout title="My Exams">
     <h1 class="h3 mb-3">Available exams</h1>
+    @foreach (auth()->user()->unreadNotifications as $notification)
+    <div class="alert alert-info">
+        {{ $notification->data['message'] }}
+        <a href="{{ route('attempts.result', $notification->data['attempt_id']) }}">View result</a>
+    </div>
+    @endforeach
     @if (session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -32,8 +38,10 @@
                 @elseif ($attempt->status === 'in_progress'&& $attempt->expires_at->isFuture())
                 <a href="{{ route('attempts.show', $attempt) }}" class="btn btn-sm btn-warning">Continue</a>
 
+                @elseif ($attempt->graded_at)
+                <a href="{{ route('attempts.result', $attempt) }}" class="btn btn-sm btn-outline-primary">View result</a>
                 @else
-                <span class="badge text-bg-secondary">Submitted</span>
+                <span class="badge text-bg-secondary">Waiting for result</span>
                 @endif
             </div>
 

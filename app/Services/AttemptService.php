@@ -132,4 +132,10 @@ class AttemptService
 
         return $attempts->count();
     }
+    public function resultFor(Attempt $attempt)
+    {
+        $attempt->student->unreadNotifications->where('data.attempt_id', $attempt->id)->markAsRead();
+
+        return $attempt->load('exam.questions.options', 'attemptAnswers');
+    }
 }

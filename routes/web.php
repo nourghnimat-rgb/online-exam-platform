@@ -81,4 +81,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/attempts/{attempt}',[AttemptController::class,'show'])->can('answer','attempt')->name('attempts.show');
     Route::put('/attempts/{attempt}/answers', [AttemptController::class, 'saveAnswers'])->name('attempts.answers');
     Route::post('/attempts/{attempt}/submit', [AttemptController::class, 'submit'])->can('answer', 'attempt')->name('attempts.submit');
+    Route::get('/attempts/{attempt}/result', [AttemptController::class, 'result'])->can('viewResult', 'attempt')->name('attempts.result');
 });
