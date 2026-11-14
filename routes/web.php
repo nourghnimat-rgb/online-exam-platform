@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttemptController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
@@ -71,7 +72,13 @@ Route::middleware('auth')->group(function () {
         ->name('questions.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])
         ->can('delete', 'question')->name('questions.destroy');
-        
+
     Route::get('/my-exams', [StudentExamController::class, 'index'])
         ->can('viewAvailable', Exam::class)->name('exams.available');
+    Route::post('/exams/{exam}/attempts', [AttemptController::class, 'store'])
+        ->can('take', 'exam')->name('attempts.store');
+    
+    Route::get('/attempts/{attempt}',[AttemptController::class,'show'])->can('answer','attempt')->name('attempts.show');
+    Route::put('/attempts/{attempt}/answers', [AttemptController::class, 'saveAnswers'])->name('attempts.answers');
+    Route::post('/attempts/{attempt}/submit', [AttemptController::class, 'submit'])->can('answer', 'attempt')->name('attempts.submit');
 });

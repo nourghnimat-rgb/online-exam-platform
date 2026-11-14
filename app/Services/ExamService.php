@@ -58,6 +58,7 @@ class ExamService
 
         $courseIds = $student->courses()->pluck('courses.id');
 
+
         return Exam::query()
             ->whereIn('course_id', $courseIds)
             ->where('status', 'published')
@@ -67,6 +68,6 @@ class ExamService
             ->with(['attempts' => function ($query) use ($student) {
                 $query->where('student_id', $student->id);
             }])
-            ->orderBy('closes_at');
+            ->orderBy('closes_at')->paginate(15);
     }
 }

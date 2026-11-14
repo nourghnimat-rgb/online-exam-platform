@@ -7,7 +7,7 @@
     @if (session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif
     @error('exam') <div class="alert alert-danger">{{ $message }}</div> @enderror
 
-    {{-- قائمة الأسئلة --}}
+    
     @forelse ($questions as $question)
         <div class="bg-white border rounded p-3 mb-3">
             <div class="d-flex justify-content-between">
@@ -41,7 +41,7 @@
         <div class="alert alert-light border text-center text-muted">No questions yet.</div>
     @endforelse
 
-    {{-- فورم الإضافة --}}
+  
     <form method="POST" action="{{ route('questions.store', $exam) }}" class="bg-white border rounded p-4 mt-4">
         @csrf
         <h2 class="h5 mb-3">Add question</h2>

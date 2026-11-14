@@ -26,4 +26,8 @@ class Attempt extends Model
     {
         return $this->hasMany(AttemptAnswer::class);
     }
+    public function remainingSeconds(): int
+    {
+        return max(0, (int) now()->diffInSeconds($this->expires_at, false));
+    }
 }
