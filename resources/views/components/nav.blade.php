@@ -28,6 +28,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('exams.available') }}">My Exams</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('attempts.mine') }}">My Results</a>
+            </li>
             @endif
 
             <li class="nav-item">

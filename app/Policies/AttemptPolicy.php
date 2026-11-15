@@ -8,6 +8,10 @@ use Illuminate\Auth\Access\Response;
 
 class AttemptPolicy
 {
+    public function viewAny(User $user): bool
+    {
+        return $user->role === 'student';
+    }
   
     public function answer(User $user, Attempt $attempt): bool
     {
