@@ -12,18 +12,18 @@ class CourseService
     public function paginate($search, $user)
     {
         if ($user->role === 'instructor') {
-        $query = $user->courses();
-    } else {
-        $query = Course::query();
-    }
+            $query = $user->courses();
+        } else {
+            $query = Course::query();
+        }
 
-    $query->with('instructors')->withCount('users')->orderBy('name');
+        $query->with('instructors')->withCount('users')->orderBy('name');
 
-    if ($search) {
-        $query->where('name', 'like', '%' . $search . '%');
-    }
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
 
-    return $query->paginate(15);
+        return $query->paginate(15);
     }
 
     public function create(array $data): Course
@@ -71,5 +71,9 @@ class CourseService
     public function removeStudent(Course $course, User $student)
     {
         $course->users()->detach($student->id);
+    }
+    public function enrolledCourses(User $user)
+    {
+        return $user->courses()->withCount('exams')->orderBy('name')->get();
     }
 }

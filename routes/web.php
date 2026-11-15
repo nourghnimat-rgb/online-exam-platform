@@ -8,6 +8,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\StudentExamController;
 use App\Http\Controllers\UserController;
+use App\Models\Attempt;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\User;
@@ -68,6 +69,8 @@ Route::middleware('auth')->group(function () {
         ->can('manageQuestions', 'exam')->name('questions.index');
     Route::post('/exams/{exam}/questions', [QuestionController::class, 'store'])
         ->name('questions.store');
+    Route::get('/questions/{question}/edit', [QuestionController::class, 'edit'])
+        ->can('update', 'question')->name('questions.edit');
     Route::put('/questions/{question}', [QuestionController::class, 'update'])
         ->name('questions.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])
@@ -77,8 +80,9 @@ Route::middleware('auth')->group(function () {
         ->can('viewAvailable', Exam::class)->name('exams.available');
     Route::post('/exams/{exam}/attempts', [AttemptController::class, 'store'])
         ->can('take', 'exam')->name('attempts.store');
-    
-    Route::get('/attempts/{attempt}',[AttemptController::class,'show'])->can('answer','attempt')->name('attempts.show');
+
+    Route::get('/my-results', [AttemptController::class, 'mine'])->can('viewAny', Attempt::class)->name('attempts.mine');
+    Route::get('/attempts/{attempt}', [AttemptController::class, 'show'])->can('answer', 'attempt')->name('attempts.show');
     Route::put('/attempts/{attempt}/answers', [AttemptController::class, 'saveAnswers'])->name('attempts.answers');
     Route::post('/attempts/{attempt}/submit', [AttemptController::class, 'submit'])->can('answer', 'attempt')->name('attempts.submit');
     Route::get('/attempts/{attempt}/result', [AttemptController::class, 'result'])->can('viewResult', 'attempt')->name('attempts.result');

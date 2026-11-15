@@ -25,9 +25,7 @@ class AttemptController extends Controller
     }
     public function saveAnswers(SaveAnswerRequest $request, Attempt $attempt, AttemptService $service)
     {
-        $service->saveAnswers($attempt, $request->validated('answers') ?? []);
-
-        return response()->json(['saved_at' => now()->format('H:i:s')]);
+         return response()->json($service->saveAnswers($attempt, $request->validated('answers') ?? []));
     }
     public function submit(Attempt $attempt, AttemptService $service)
     {
@@ -45,5 +43,9 @@ class AttemptController extends Controller
             'exam'     => $exam,
             'attempts' => $service->forExam($exam),
         ]);
+    }
+    public function mine(Request $request, AttemptService $service)
+    {
+        return view('attempts.mine', ['attempts' => $service->resultsFor($request->user())]);
     }
 }

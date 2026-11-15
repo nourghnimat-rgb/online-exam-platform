@@ -14,7 +14,7 @@ class CourseController extends Controller
 {
     public function index(Request $request, CourseService $service)
     {
-        $courses = $service->paginate($request->search,$request->user());
+        $courses = $service->paginate($request->search, $request->user());
         return view('courses.index', ['courses' => $courses]);
     }
     public function create()
@@ -67,9 +67,8 @@ class CourseController extends Controller
         $service->removeStudent($course, $user);
         return back()->with('success', 'student removed successfully');
     }
-    public function mine(Request $request){
-
-        $courses = $request->user()->courses()->withCount('exams')->orderBy('name')->get();
-        return view('courses.mine',['courses'=>$courses]);
+    public function mine(Request $request, CourseService $service)
+    {
+        return view('courses.mine', ['courses' => $service->enrolledCourses($request->user())]);
     }
 }

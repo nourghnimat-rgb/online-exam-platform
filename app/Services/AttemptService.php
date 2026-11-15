@@ -43,6 +43,11 @@ class AttemptService
             ->with('options:id,question_id,text,position')
             ->orderBy('position')
             ->get();
+        if ($attempt->exam->randomize_questions) {
+            return $questions->shuffle($attempt->id);
+        }
+
+        return $questions;
     }
     public function saveAnswers(Attempt $attempt, array $answers)
     {
@@ -92,6 +97,10 @@ class AttemptService
                 }
             }
         });
+        return [
+            'saved_at'          => now()->format('H:i:s'),
+            'remaining_seconds' => $attempt->remainingSeconds(),
+        ];
     }
     public function notExpiresd(Attempt $attempt)
     {
@@ -139,7 +148,15 @@ class AttemptService
         return $attempt->load('exam.questions.options', 'attemptAnswers');
     }
     public function forExam(Exam $exam)
-{
-    return $exam->attempts()->with('student')->latest()->paginate(15);
-}
+    {
+        return $exam->attempts()->with('student')->latest()->paginate(15);
+    }
+    public function resultsFor(User $student)
+    {
+        return $student->attempts()
+            ->with('exam.course')
+            ->where('status', '!=', 'in_progress')
+            ->latest('submitted_at')
+            ->paginate(15);
+    }
 }
