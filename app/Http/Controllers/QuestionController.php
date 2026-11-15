@@ -11,24 +11,28 @@ use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
-     public function index(Exam $exam, QuestionService $service)
+    public function index(Exam $exam, QuestionService $service)
     {
         return view('questions.index', ['exam' => $exam, 'questions' => $service->index($exam)]);
     }
-    public function store(StoreQuestionRequest $request,Exam $exam, QuestionService $service)
+    public function store(StoreQuestionRequest $request, Exam $exam, QuestionService $service)
     {
-        $service->create($exam,$request->validated());
-        return redirect()->route('questions.index',$exam)->with('success','question added');
+        $service->create($exam, $request->validated());
+        return redirect()->route('questions.index', $exam)->with('success', 'question added');
     }
-    public function update(UpdateQuestionRequest $request,Question $question, QuestionService $service)
+    public function edit(Question $question)
     {
-        $service->update($question,$request->validated());
-        return redirect()->route('questions.index',$question->exam_id)->with('success','question updated');
+        return view('questions.edit', ['question' => $question->load('options'), 'exam' => $question->exam]);
+    }
+    public function update(UpdateQuestionRequest $request, Question $question, QuestionService $service)
+    {
+        $service->update($question, $request->validated());
+        return redirect()->route('questions.index', $question->exam_id)->with('success', 'question updated');
     }
     public function destroy(Question $question, QuestionService $service)
-{
-    $service->delete($question);
+    {
+        $service->delete($question);
 
-    return back()->with('success', 'Question deleted');
-}
+        return back()->with('success', 'Question deleted');
+    }
 }

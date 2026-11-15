@@ -12,7 +12,7 @@ class UpdateQuestionRequest extends StoreQuestionRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('manageQuestions', $this->route('question'));
+        return  $this->user()->can('update', $this->route('question'));
     }
 
     
