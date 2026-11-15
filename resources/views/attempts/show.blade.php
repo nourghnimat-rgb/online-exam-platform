@@ -7,7 +7,16 @@
         </div>
     </div>
 
-    @error('attempt') <div class="alert alert-danger">{{ $message }}</div> @enderror
+    @error('attempt')
+    <div id="time-up" class="alert alert-warning d-none">
+        Time is up. Your saved answers will be graded automatically.
+    <a href="{{ route('attempts.mine') }}" class="alert-link">Go to my results</a>
+    </div>
+    <div class="alert alert-danger">{
+        { $message }}
+
+    </div>
+    @enderror
 
     <form id="attempt-form" method="POST" action="{{ route('attempts.answers', $attempt) }}">
         @csrf
@@ -57,35 +66,62 @@
         <button type="submit" class="btn btn-success">Submit exam</button>
     </form>
 
-    <script>
+       <script>
         const timer = document.getElementById('timer');
         const form = document.getElementById('attempt-form');
         const submitForm = document.getElementById('submit-form');
         const message = document.getElementById('save-status');
-        let seconds = Number(timer.dataset.remaining);
+        const timeUp = document.getElementById('time-up');
+
+        
+        let deadline = Date.now() + Number(timer.dataset.remaining) * 1000;
+        let finished = false;
+
+        function secondsLeft() {
+            return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+        }
 
         function showTime() {
+            const seconds = secondsLeft();
             const minutes = Math.floor(seconds / 60);
             let rest = seconds % 60;
             if (rest < 10) {
                 rest = '0' + rest;
             }
             timer.textContent = minutes + ':' + rest;
+            timer.classList.toggle('text-bg-danger', seconds <= 60);
+            timer.classList.toggle('text-bg-dark', seconds > 60);
+        }
+
+        function finish() {
+            if (finished) {
+                return;
+            }
+            finished = true;
+            clearInterval(clock);
+            timer.textContent = '0:00';
+            form.querySelectorAll('input, textarea, select').forEach(function (field) {
+                field.disabled = true;
+            });
+            submitForm.classList.add('d-none');
+            timeUp.classList.remove('d-none');
+            message.textContent = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         showTime();
 
         const clock = setInterval(function () {
-            seconds = seconds - 1;
             showTime();
-
-            if (seconds <= 0) {
-                clearInterval(clock);
-                window.location = "{{ route('exams.available') }}";
+            if (secondsLeft() <= 0) {
+                finish();
             }
         }, 1000);
 
         form.addEventListener('change', function () {
+            if (finished) {
+                return;
+            }
             fetch(form.action, {
                 method: 'POST',
                 body: new FormData(form),
@@ -93,11 +129,22 @@
                 keepalive: true
             })
             .then(function (response) {
+                
+                if (response.status === 422 || response.status === 403) {
+                    finish();
+                    return null;
+                }
                 return response.json();
             })
             .then(function (result) {
+                if (result === null) {
+                    return;
+                }
                 if (result.saved_at) {
                     message.textContent = 'Saved at ' + result.saved_at;
+                    if (typeof result.remaining_seconds === 'number') {
+                        deadline = Date.now() + result.remaining_seconds * 1000;
+                    }
                 } else {
                     message.textContent = 'Could not save';
                 }
