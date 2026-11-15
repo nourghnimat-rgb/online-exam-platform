@@ -38,7 +38,7 @@ class AttemptService
     }
     public function questionsFor(Attempt $attempt)
     {
-        return $attempt->exam->questions()
+        $questions = $attempt->exam->questions()
             ->select(['id', 'exam_id', 'text', 'type', 'points', 'position'])
             ->with('options:id,question_id,text,position')
             ->orderBy('position')
@@ -130,16 +130,23 @@ class AttemptService
             ->where('expires_at', '<=', now())
             ->get();
 
-        foreach ($attempts as $attempt) {
-            $attempt->update([
-                'status'       => 'expired',
-                'submitted_at' => $attempt->expires_at,
-            ]);
+        $closed = 0;
 
-            GradeAttemptJob::dispatch($attempt->id);
+        foreach ($attempts as $attempt) {
+            $claimed = Attempt::where('id', $attempt->id)
+                ->where('status', 'in_progress')
+                ->update([
+                    'status'       => 'expired',
+                    'submitted_at' => $attempt->expires_at,
+                ]);
+
+            if ($claimed) {
+                GradeAttemptJob::dispatch($attempt->id);
+                $closed++;
+            }
         }
 
-        return $attempts->count();
+        return $closed;
     }
     public function resultFor(Attempt $attempt)
     {

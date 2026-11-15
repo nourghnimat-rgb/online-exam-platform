@@ -8,7 +8,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('attempts:close-expired')]
-#[Description('Command description')]
+#[Description('Close attempts that passed their deadline and queue them for grading')]
 class CloseExpiredAttempts extends Command
 {
     /**

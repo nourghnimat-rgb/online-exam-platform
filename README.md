@@ -1,58 +1,129 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Online Exam Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel application where instructors create timed exams for their classes, students take them, and the system grades them automatically through a queue.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Three roles: **Admin**, **Instructor**, **Student** (students sign up themselves; Admin assigns Instructor/Admin roles).
+- Classes (courses) group instructors and students; membership scopes who can see and manage exams.
+- Exams with duration, availability window, pass mark, draft/published status and an option to reveal correct answers after submission.
+- Single choice, multiple choice and short text questions with point values.
+- Server-enforced time limit, autosave, one attempt per student (enforced by a database unique constraint).
+- Queued grading and queued result notifications; unsubmitted attempts are closed and graded automatically.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3+
+- Composer
+- MySQL 8+
+- Node.js and npm (only needed if you want to build the front-end assets)
 
-## Learning Laravel
+## Setup
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+~~~bash
+# 1. Install dependencies
+composer install
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# 2. Create the environment file and app key
+cp .env.example .env
+php artisan key:generate
+~~~
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. Create an empty MySQL database (for example `exam_platform`), then edit `.env`:
 
-## Agentic Development
+~~~dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=exam_platform
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+QUEUE_CONNECTION=database
+~~~
 
-```bash
-composer require laravel/boost --dev
+4. Run the migrations and seed the demo users:
 
-php artisan boost:install
-```
+~~~bash
+php artisan migrate
+php artisan db:seed
+~~~
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+5. Start the application:
 
-## Contributing
+~~~bash
+php artisan serve
+~~~
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The app is available at <http://localhost:8000>. The login page is the home page (`/`).
 
-## Code of Conduct
+## Running the queue worker (required)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Grading and result notifications run as queued jobs (`QUEUE_CONNECTION=database`). Without a worker, submitted attempts will stay at **"Waiting for result"**.
 
-## Security Vulnerabilities
+In a separate terminal:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+~~~bash
+php artisan queue:work
+~~~
 
-## License
+Restart the worker after changing any job code.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Running the scheduler (required)
+
+Attempts that are not submitted by their deadline are closed and graded by the `attempts:close-expired` command, which is scheduled to run every minute.
+
+For local development, in another terminal:
+
+~~~bash
+php artisan schedule:work
+~~~
+
+In production, add this cron entry instead:
+
+~~~cron
+* * * * * cd /path/to/exam-platform && php artisan schedule:run >> /dev/null 2>&1
+~~~
+
+You can also run it manually at any time:
+
+~~~bash
+php artisan attempts:close-expired
+~~~
+
+## Summary: terminals to keep open
+
+| Terminal | Command |
+|---|---|
+| 1 | `php artisan serve` |
+| 2 | `php artisan queue:work` |
+| 3 | `php artisan schedule:work` |
+
+## Demo accounts (created by the seeder)
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@example.com | 12345678 |
+| Instructor | instructor@example.com | 12345678 |
+| Student | student@example.com | 12345678 |
+
+Change these passwords before using the app anywhere other than your local machine.
+
+## Suggested walkthrough
+
+1. Log in as **Admin** → *Manage Courses* → create a course and assign the instructor.
+2. Log in as **Instructor** → *My Courses* → add the student (by email) to the course.
+3. As Instructor, create an exam, add questions, then **Publish** it (the availability window must include the current time).
+4. Log in as **Student** → *My Exams* → start the exam, answer, and submit.
+5. With the queue worker running, the result appears and a notification is shown to the student.
+
+## Design decisions
+
+- **Architecture:** controllers are thin; validation lives in Form Requests, authorization in Policies (Form Request `authorize()` calls the Policy), business logic in Services.
+- **One attempt per exam:** guaranteed by a unique index on `attempts (exam_id, student_id)`, so simultaneous requests cannot create two attempts.
+- **Deadline:** `expires_at` is set when the attempt starts (capped at the exam's closing time) and checked on the server for every save and submit.
+- **Correct answers:** never selected from the database while an attempt is in progress; shown on the result page only when the instructor enabled it for the exam.
+- **Grading:** a question earns its full points or zero. Multiple choice requires exactly the correct set of options. Short text is compared case-insensitively after trimming whitespace.
+- **Notifications:** stored in the database (`notifications` table) by a queued job and shown to the student.
+- **Questions are locked** once an exam has attempts.
+- **Question order:** when "Randomize question order" is enabled, each student gets a different order, stable across page reloads.

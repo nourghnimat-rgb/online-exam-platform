@@ -7,16 +7,12 @@
         </div>
     </div>
 
-    @error('attempt')
+    @error('attempt') <div class="alert alert-danger">{{ $message }}</div> @enderror
+
     <div id="time-up" class="alert alert-warning d-none">
         Time is up. Your saved answers will be graded automatically.
-    <a href="{{ route('attempts.mine') }}" class="alert-link">Go to my results</a>
+        <a href="{{ route('attempts.mine') }}" class="alert-link">Go to my results</a>
     </div>
-    <div class="alert alert-danger">{
-        { $message }}
-
-    </div>
-    @enderror
 
     <form id="attempt-form" method="POST" action="{{ route('attempts.answers', $attempt) }}">
         @csrf
@@ -66,14 +62,14 @@
         <button type="submit" class="btn btn-success">Submit exam</button>
     </form>
 
-       <script>
+    <script>
         const timer = document.getElementById('timer');
         const form = document.getElementById('attempt-form');
         const submitForm = document.getElementById('submit-form');
         const message = document.getElementById('save-status');
         const timeUp = document.getElementById('time-up');
 
-        
+
         let deadline = Date.now() + Number(timer.dataset.remaining) * 1000;
         let finished = false;
 
@@ -100,58 +96,63 @@
             finished = true;
             clearInterval(clock);
             timer.textContent = '0:00';
-            form.querySelectorAll('input, textarea, select').forEach(function (field) {
+            form.querySelectorAll('input, textarea, select').forEach(function(field) {
                 field.disabled = true;
             });
             submitForm.classList.add('d-none');
             timeUp.classList.remove('d-none');
             message.textContent = '';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         showTime();
 
-        const clock = setInterval(function () {
+        const clock = setInterval(function() {
             showTime();
             if (secondsLeft() <= 0) {
                 finish();
             }
         }, 1000);
 
-        form.addEventListener('change', function () {
+        form.addEventListener('change', function() {
             if (finished) {
                 return;
             }
             fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
-                headers: { 'Accept': 'application/json' },
-                keepalive: true
-            })
-            .then(function (response) {
-                
-                if (response.status === 422 || response.status === 403) {
-                    finish();
-                    return null;
-                }
-                return response.json();
-            })
-            .then(function (result) {
-                if (result === null) {
-                    return;
-                }
-                if (result.saved_at) {
-                    message.textContent = 'Saved at ' + result.saved_at;
-                    if (typeof result.remaining_seconds === 'number') {
-                        deadline = Date.now() + result.remaining_seconds * 1000;
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    keepalive: true
+                })
+                .then(function(response) {
+
+                    if (response.status === 422 || response.status === 403) {
+                        finish();
+                        return null;
                     }
-                } else {
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (result === null) {
+                        return;
+                    }
+                    if (result.saved_at) {
+                        message.textContent = 'Saved at ' + result.saved_at;
+                        if (typeof result.remaining_seconds === 'number') {
+                            deadline = Date.now() + result.remaining_seconds * 1000;
+                        }
+                    } else {
+                        message.textContent = 'Could not save';
+                    }
+                })
+                .catch(function() {
                     message.textContent = 'Could not save';
-                }
-            })
-            .catch(function () {
-                message.textContent = 'Could not save';
-            });
+                });
         });
     </script>
 </x-layout>
