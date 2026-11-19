@@ -1,4 +1,5 @@
 <x-layout title="Login">
+<div class="auth-card col-12 col-md-5 bg-white bg-opacity-75 rounded-4 shadow p-4">
     <h1 class="h3 mb-4">Login</h1>
 
     <form method="POST" action="{{ route('login') }}">
@@ -26,4 +27,5 @@
     </form>
 
     <p class="mt-3 mb-0 small">Don't have an account? <a href="{{ route('register') }}">Register</a></p>
+    </div>
 </x-layout>

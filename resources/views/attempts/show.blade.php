@@ -62,13 +62,13 @@
         <button type="submit" class="btn btn-success">Submit exam</button>
     </form>
 
+
     <script>
         const timer = document.getElementById('timer');
         const form = document.getElementById('attempt-form');
         const submitForm = document.getElementById('submit-form');
         const message = document.getElementById('save-status');
         const timeUp = document.getElementById('time-up');
-
 
         let deadline = Date.now() + Number(timer.dataset.remaining) * 1000;
         let finished = false;
@@ -117,11 +117,12 @@
             }
         }, 1000);
 
-        form.addEventListener('change', function() {
+        // يرجّع true إذا انحفظت الأجوبة، و false إذا فشل الحفظ
+        function saveAnswers() {
             if (finished) {
-                return;
+                return Promise.resolve(false);
             }
-            fetch(form.action, {
+            return fetch(form.action, {
                     method: 'POST',
                     body: new FormData(form),
                     headers: {
@@ -130,7 +131,6 @@
                     keepalive: true
                 })
                 .then(function(response) {
-
                     if (response.status === 422 || response.status === 403) {
                         finish();
                         return null;
@@ -139,20 +139,38 @@
                 })
                 .then(function(result) {
                     if (result === null) {
-                        return;
+                        return false;
                     }
                     if (result.saved_at) {
                         message.textContent = 'Saved at ' + result.saved_at;
                         if (typeof result.remaining_seconds === 'number') {
                             deadline = Date.now() + result.remaining_seconds * 1000;
                         }
-                    } else {
-                        message.textContent = 'Could not save';
+                        return true;
                     }
+                    message.textContent = 'Could not save';
+                    return false;
                 })
                 .catch(function() {
-                    message.textContent = 'Could not save';
+                    message.textContent = 'Could not save. Check your connection and try again.';
+                    return false;
                 });
+        }
+
+        form.addEventListener('change', saveAnswers);
+
+        submitForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const button = submitForm.querySelector('button');
+            button.disabled = true;
+
+            saveAnswers().then(function(ok) {
+                if (ok) {
+                    submitForm.submit();
+                } else {
+                    button.disabled = false;
+                }
+            });
         });
     </script>
 </x-layout>
