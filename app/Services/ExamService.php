@@ -32,7 +32,7 @@ class ExamService
     public function publish(Exam $exam)
     {
         if (!$exam->questions()->exists()) {
-            throw ValidationException::withMessages(['status' => 'Add atleast one questions to publish this exam']);
+            throw ValidationException::withMessages(['status' => 'Add atleast one question to publish this exam']);
         }
         $exam->update(['status' => 'published']);
         return $exam;

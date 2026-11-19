@@ -18,7 +18,7 @@ class AuthController extends Controller
     }
     public function register(RegisterRequest $request)
     {
-        $user = $this->authService->register($request->validated());
+        $this->authService->register($request->validated());
         return redirect()->route('dashboard');
     }
     public function showLogin(): View
@@ -27,12 +27,12 @@ class AuthController extends Controller
     }
     public function login(LoginRequest $request)
     {
-        $user = $this->authService->login($request->validated());
+        $this->authService->login($request->validated());
         return redirect()->route('dashboard');
     }
-    public function logout(){
+    public function logout()
+    {
         $this->authService->logout();
         return redirect()->route('login');
-
     }
 }

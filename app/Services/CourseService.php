@@ -43,12 +43,12 @@ class CourseService
 
         return User::where('role', 'instructor')->orderBy('name')->get();
     }
-    public function assignInstructors(Course $course, array $instructrIds)
+    public function assignInstructors(Course $course, array $instructorIds)
     {
         $oldIds = $course->instructors()->pluck('users.id')->toArray();
 
         $course->users()->detach($oldIds);
-        $course->users()->attach($instructrIds);
+        $course->users()->attach($instructorIds);
     }
 
     public function students(Course $course)

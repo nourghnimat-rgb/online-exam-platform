@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Foundation\Auth\User as AuthUser;
 
 class UserService
 {

@@ -22,11 +22,11 @@ class UserController extends Controller
     public function store(StoreUserRequest $request, UserService $service)
     {
         $service->create($request->validated());
-        return redirect()->route('users.index')->with('success', 'user ceated');
+        return redirect()->route('users.index')->with('success', 'user created');
     }
     public function updateRole(UpdateUserRequest $request, UserService $service, User $user)
     {
-        $service->updateRole($user, $request->role);
+        $service->updateRole($user, $request->validated('role'));
         return back()->with('success', 'role updated');
     }
     public function destroy(User $user, UserService $service)

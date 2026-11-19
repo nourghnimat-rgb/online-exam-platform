@@ -116,8 +116,6 @@
                 finish();
             }
         }, 1000);
-
-        // يرجّع true إذا انحفظت الأجوبة، و false إذا فشل الحفظ
         function saveAnswers() {
             if (finished) {
                 return Promise.resolve(false);

@@ -51,7 +51,7 @@ class AttemptService
     }
     public function saveAnswers(Attempt $attempt, array $answers)
     {
-        $this->notExpiresd($attempt);
+        $this->notExpired($attempt);
 
         $questions = $attempt->exam->questions()
             ->with('options:id,question_id')
@@ -102,7 +102,7 @@ class AttemptService
             'remaining_seconds' => $attempt->remainingSeconds(),
         ];
     }
-    public function notExpiresd(Attempt $attempt)
+    public function notExpired(Attempt $attempt)
     {
         if (now()->greaterThanOrEqualTo($attempt->expires_at)) {
             throw ValidationException::withMessages([

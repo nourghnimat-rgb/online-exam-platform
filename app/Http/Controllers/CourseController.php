@@ -24,7 +24,7 @@ class CourseController extends Controller
     public function store(StoreCourseRequest $request, CourseService $service)
     {
         $service->create($request->validated());
-        return redirect()->route('courses.index')->with('success', 'Course ceated');
+        return redirect()->route('courses.index')->with('success', 'Course created');
     }
     public function edit(Course $course, CourseService $service)
     {
@@ -40,7 +40,7 @@ class CourseController extends Controller
     }
     public function updateInstructors(AssignInstructorRequest $request, Course $course, CourseService $service)
     {
-        $service->assignInstructors($course, $request->instructor_ids ?? []);
+        $service->assignInstructors($course, $request->validated('instructor_ids') ?? []);
 
         return back()->with('success', 'Instructors updated.');
     }
